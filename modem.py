@@ -42,10 +42,10 @@ def make():
 	print "[OK] Modem mode switch success"
 	reboot = raw_input("The changes have been made to your Huawei E3551 USB modem. Do you wish to reboot for changes to take place?(Y or N)")
 	if(reboot == 'Y' or reboot == 'y' or reboot == 'yes' or reboot == 'YES'):
+		print "Rebooting..."
 		os.system("reboot")
 	else:
 		exit()
-	print "Rebooting..."
 	return
 
 details()

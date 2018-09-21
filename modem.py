@@ -44,5 +44,5 @@ def make():
 		os.system("reboot")
 	else:
 		exit()
-
-details()
+if __name__ == "__main__":
+	details()

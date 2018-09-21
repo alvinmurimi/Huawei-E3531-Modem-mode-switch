@@ -21,7 +21,6 @@ def details():
 		print "[OK] Modem found\n"
 		print "[*] Print checking dependencies..."
 	confirm()
-	return
 def confirm():
 	confirm = commands.getstatusoutput("usb_modeswitch -v")
 	confirm = str(confirm[1])
@@ -36,7 +35,6 @@ def confirm():
 		print "[OK] USB modeswitch installed.."
 		print "[*]  Starting swich process"
 		make()
-	return
 def make():
 	os.system("v=$(lsusb | grep 'Huawei' | awk '{ print $6 }' | awk -F: '{ print $1 }'); p=$(lsusb | grep 'Huawei' | awk '{ print $6 }' | awk -F: '{ print $2 }'); sudo usb_modeswitch -v $v -p $p -M '55534243123456780000000000000011062000000100000000000000000000'")
 	print "[OK] Modem mode switch success"
@@ -46,6 +44,5 @@ def make():
 		os.system("reboot")
 	else:
 		exit()
-	return
 
 details()

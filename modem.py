@@ -47,4 +47,4 @@ if __name__ == "__main__":
     |_| |_|\__,_|\__,_| \_/\_/ \___|_|
         E3531 modem mode switcher
     """)
-    main()
+    main() 

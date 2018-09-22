@@ -1,48 +1,50 @@
-#!/usr/bin/python
-import commands
-import os
 import subprocess
-print """
- _                              _ 
-| |__  _   _  __ ___      _____(_)
-| '_ \| | | |/ _` \ \ /\ / / _ \ |
-| | | | |_| | (_| |\ V  V /  __/ |
-|_| |_|\__,_|\__,_| \_/\_/ \___|_|
-     E3531 modem mode switcher
-"""
-def details():
-	modem = commands.getstatusoutput("lsusb | grep 'Huawei'")
-	modem = str(modem[1])
-	if(len(modem) < 1):
-		print "Modem not found. Please connect your USB modem and try again\n"
-		raw_input("Press any key to exit.")
-		exit()
-	else:
-		print "[OK] Modem found\n"
-		print "[*] Print checking dependencies..."
-	confirm()
-def confirm():
-	confirm = commands.getstatusoutput("usb_modeswitch -v")
-	confirm = str(confirm[1])
-	if(len(confirm) < 100):
-		response = raw_input("usb modeswitch is not installed. Do you want to install it? (Y or N)")
-		if(response == 'Y' or response == 'y'):
-			os.system("apt-get install usb-modeswitch")
-		else:
-			print "Please install usb modeswitch"
-			exit()
-	else:
-		print "[OK] USB modeswitch installed.."
-		print "[*]  Starting swich process"
-		make()
-def make():
-	os.system("v=$(lsusb | grep 'Huawei' | awk '{ print $6 }' | awk -F: '{ print $1 }'); p=$(lsusb | grep 'Huawei' | awk '{ print $6 }' | awk -F: '{ print $2 }'); sudo usb_modeswitch -v $v -p $p -M '55534243123456780000000000000011062000000100000000000000000000'")
-	print "[OK] Modem mode switch success"
-	reboot = raw_input("The changes have been made to your Huawei E3551 USB modem. Do you wish to reboot for changes to take place?(Y or N)")
-	if(reboot == 'Y' or reboot == 'y' or reboot == 'yes' or reboot == 'YES'):
-		print "Rebooting..."
-		os.system("reboot")
-	else:
-		exit()
+import os
+
+def get_usb_modem():
+    status, output = subprocess.getstatusoutput(
+        "lsusb | grep 'Huawei'")
+    if status:
+        print("Modem not found. Please connect your USB modem and try again\n")
+        input("Press any key to exit.")
+        exit()
+    return output
+
+def check_dependencies():
+    status, output = subprocess.getstatusoutput(
+        "usb_modeswitch -v")
+    if status:
+        response = input(
+            "usb modeswitch is not installed. Do you want to install it? (Y or N)")
+        if response.lower() == 'y':
+            os.system("apt-get install usb-modeswitch")
+        else:
+            print("Please install usb modeswitch")
+            exit()
+    return output
+
+def main():
+    output = get_usb_modem()
+    check_dependencies()
+    print("[OK] USB modeswitch installed..")
+    print("[*]  Starting switch process")
+
+    bus = output.split(" ")[1]
+    device = output.split(" ")[3][:-1]
+    os.system("sudo usb_modeswitch -v {} -p {} -M '55534243123456780000000000000011062000000100000000000000000000'".format(bus, device))
+    print("[OK] Modem mode switch success")
+    reboot = input(
+        """The changes have been made to your Huawei E3551 USB modem. 
+        Do you wish to reboot for changes to take place?(Y or N)""")
+    os.system("reboot") if reboot.lower() == 'y' else exit()
+
 if __name__ == "__main__":
-	details()
+    print("""
+    _                              _ 
+    | |__  _   _  __ ___      _____(_)
+    | '_ \| | | |/ _` \ \ /\ / / _ \ |
+    | | | | |_| | (_| |\ V  V /  __/ |
+    |_| |_|\__,_|\__,_| \_/\_/ \___|_|
+        E3531 modem mode switcher
+    """)
+    main()
